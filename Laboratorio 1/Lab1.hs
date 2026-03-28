@@ -14,7 +14,16 @@ data L = V Var | Neg L | Bin L BC L
 data BC = And | Or | Imp | Iff
   deriving (Show, Eq)
   
-  
+p :: L
+p = V "p"
+
+q :: L
+q = V "q"
+
+r :: L
+r = V "r"
+
+
 -- EJERCICIO 1.2 --
 --a)
 fa :: L
@@ -33,7 +42,9 @@ fd = Bin (Neg (Bin (V "r") Imp (V "r"))) And (Bin (Neg (Neg (V "p"))) Or (Neg (B
 -- EJERCICIO 1.3 --
 --a)
 cantBin :: L -> Int
-cantBin = undefined
+cantBin (V x) = 0
+cantBin (Neg l) = cantBin l
+cantBin (Bin l o r) = 1 + cantBin l + cantBin r
 
 --b)
 valores :: L -> [(Var,Bool)]
