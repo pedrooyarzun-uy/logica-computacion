@@ -74,19 +74,23 @@ cantPropX (V x) i = if x == i
 cantPropX (Neg l) i = cantPropX l i
 cantPropX (Bin l o r) i = (cantPropX l i) + (cantPropX r i)
 
-  
-
 --f)
 listarProp :: L -> [Var]
 listarProp = undefined
 
 --g)
 sustCon :: L -> BC -> BC -> L
-sustCon = undefined
+sustCon (V x) _ _ = V x
+sustCon (Neg l) f s = Neg (sustCon l f s)
+sustCon (Bin l o r) f s = if o == f 
+  then
+    Bin(sustCon l f s) s (sustCon r f s)
+  else
+    Bin(sustCon l f s) o (sustCon r f s) 
 
 --h)
 swapCon :: L -> BC -> BC -> L
-swapCon = undefined
+swapCon = undefined 
 
 --i)
 invertir :: L -> L
