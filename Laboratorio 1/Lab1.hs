@@ -59,7 +59,10 @@ dobleNeg (Bin l o r) = Bin (dobleNeg l) o (dobleNeg r)
 
 --d)
 cambiar :: L -> L
-cambiar = undefined
+cambiar (V x) = V x
+cambiar (Neg l) = Neg (cambiar l)
+cambiar (Bin l Or r) = Bin (Neg (cambiar l)) Imp (cambiar r)
+cambiar (Bin l o r) = Bin (cambiar l) o (cambiar r)
 
 --e)
 cantPropX :: L -> Var -> Int
