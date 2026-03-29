@@ -90,7 +90,17 @@ sustCon (Bin l o r) f s = if o == f
 
 --h)
 swapCon :: L -> BC -> BC -> L
-swapCon = undefined 
+swapCon (V x) _ _ = V x
+swapCon (Neg l) f s = Neg (swapCon l f s)
+swapCon (Bin l o r) f s = if o == f 
+  then
+    Bin (swapCon l f s) s (swapCon r f s)
+  else 
+    if o == s 
+      then
+        Bin (swapCon l f s) f (swapCon r f s)
+      else 
+        Bin (swapCon l f s) o (swapCon r f s)
 
 --i)
 invertir :: L -> L
