@@ -66,7 +66,15 @@ cambiar (Bin l o r) = Bin (cambiar l) o (cambiar r)
 
 --e)
 cantPropX :: L -> Var -> Int
-cantPropX = undefined
+cantPropX (V x) i = if x == i 
+  then
+    1
+  else
+    0
+cantPropX (Neg l) i = cantPropX l i
+cantPropX (Bin l o r) i = (cantPropX l i) + (cantPropX r i)
+
+  
 
 --f)
 listarProp :: L -> [Var]
