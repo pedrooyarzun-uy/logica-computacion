@@ -52,7 +52,10 @@ valores = undefined
 
 --c)
 dobleNeg :: L -> L
-dobleNeg = undefined
+dobleNeg (V x) = V x
+dobleNeg (Neg (Neg l)) = dobleNeg l
+dobleNeg (Neg l ) = Neg (dobleNeg l)
+dobleNeg (Bin l o r) = Bin (dobleNeg l) o (dobleNeg r)
 
 --d)
 cambiar :: L -> L
