@@ -117,4 +117,10 @@ sustSimp v f1 (Bin l o r) = Bin (sustSimp v f1 l) o (sustSimp v f1 r)
 
 --k)
 sustMult :: [(Var, L)] -> L -> L
-sustMult = undefined
+sustMult f (V i) = case f of 
+  [] -> V i
+  (v,l):xs -> case v == i of
+    True -> l
+    False -> sustMult xs (V i)
+sustMult f (Neg l) = Neg(sustMult f l)
+sustMult f (Bin l o r) = Bin (sustMult f l) o (sustMult f r)
