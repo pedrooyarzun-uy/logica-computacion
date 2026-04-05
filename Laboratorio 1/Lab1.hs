@@ -48,7 +48,9 @@ cantBin (Bin l o r) = 1 + cantBin l + cantBin r
 
 --b)
 valores :: L -> [(Var,Bool)]
-valores = undefined
+valores (V x) = [(x, True)]
+valores (Neg (V x)) = [(x, False)]
+valores (Bin l And r) = valores l ++ valores r
 
 --c)
 dobleNeg :: L -> L
