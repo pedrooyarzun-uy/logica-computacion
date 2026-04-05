@@ -5,6 +5,7 @@ module Lab1 where
 ----------------------------------------------------
 
 import Prelude
+import Data.List
 
 -- EJERCICIO 1.1 --
 type Var = String
@@ -78,7 +79,9 @@ cantPropX (Bin l o r) i = (cantPropX l i) + (cantPropX r i)
 
 --f)
 listarProp :: L -> [Var]
-listarProp = undefined
+listarProp (V x) = [x]
+listarProp (Neg l) = listarProp l
+listarProp (Bin l _ r) = nub (listarProp l ++ listarProp r)
 
 --g)
 sustCon :: L -> BC -> BC -> L
