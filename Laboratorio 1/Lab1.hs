@@ -109,7 +109,11 @@ invertir (Bin l o r) = case swapCon (Bin p o q) And Or of
 
 --j)
 sustSimp :: Var -> L -> L -> L
-sustSimp = undefined
+sustSimp v f1 (V x) = case x == v of 
+  True -> f1
+  False -> (V x)
+sustSimp v f1 (Neg l) = Neg(sustSimp v f1 l)
+sustSimp v f1 (Bin l o r) = Bin (sustSimp v f1 l) o (sustSimp v f1 r)
 
 --k)
 sustMult :: [(Var, L)] -> L -> L
