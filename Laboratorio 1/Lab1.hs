@@ -69,11 +69,9 @@ cambiar (Bin l o r) = Bin (cambiar l) o (cambiar r)
 
 --e)
 cantPropX :: L -> Var -> Int
-cantPropX (V x) i = if x == i 
-  then
-    1
-  else
-    0
+cantPropX (V x) i = case x == i of
+  True -> 1
+  False -> 0 
 cantPropX (Neg l) i = cantPropX l i
 cantPropX (Bin l o r) i = (cantPropX l i) + (cantPropX r i)
 
@@ -87,29 +85,27 @@ listarProp (Bin l _ r) = nub (listarProp l ++ listarProp r)
 sustCon :: L -> BC -> BC -> L
 sustCon (V x) _ _ = V x
 sustCon (Neg l) f s = Neg (sustCon l f s)
-sustCon (Bin l o r) f s = if o == f 
-  then
-    Bin(sustCon l f s) s (sustCon r f s)
-  else
-    Bin(sustCon l f s) o (sustCon r f s) 
+sustCon (Bin l o r) f s = case o == f of 
+  True -> Bin(sustCon l f s) s (sustCon r f s)
+  False -> Bin(sustCon l f s) o (sustCon r f s) 
 
 --h)
 swapCon :: L -> BC -> BC -> L
 swapCon (V x) _ _ = V x
 swapCon (Neg l) f s = Neg (swapCon l f s)
-swapCon (Bin l o r) f s = if o == f 
-  then
-    Bin (swapCon l f s) s (swapCon r f s)
-  else 
-    if o == s 
-      then
-        Bin (swapCon l f s) f (swapCon r f s)
-      else 
-        Bin (swapCon l f s) o (swapCon r f s)
+swapCon (Bin l o r) f s = case o == f of
+  True -> Bin (swapCon l f s) s (swapCon r f s)
+  False -> case o == s of  
+    True -> Bin (swapCon l f s) f (swapCon r f s)
+    False -> Bin (swapCon l f s) o (swapCon r f s)
 
 --i)
 invertir :: L -> L
-invertir = undefined
+invertir (V x) = Neg (V x)
+invertir (Neg (V x)) = V x
+invertir (Neg l) = dobleNeg (invertir l)
+invertir (Bin l o r) = case swapCon (Bin p o q) And Or of 
+  Bin _ j _ -> Bin(invertir l) j (invertir r)  
 
 --j)
 sustSimp :: Var -> L -> L -> L
