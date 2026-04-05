@@ -76,7 +76,7 @@ cantPropX (Neg l) i = cantPropX l i
 cantPropX (Bin l o r) i = (cantPropX l i) + (cantPropX r i)
 
 --f)
--- Usamos nub pero nos quedo la duda si se podía 😅
+-- Usamos nub pero nos quedo la duda si se podía dado que no se nos ocurrió como hacerlo ni siquiera con cantPropX😅
 listarProp :: L -> [Var]
 listarProp (V x) = [x]
 listarProp (Neg l) = listarProp l
