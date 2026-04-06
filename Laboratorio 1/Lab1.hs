@@ -1,7 +1,7 @@
 module Lab1 where
 ------------------- Estudiante/s -------------------
--- Nombres y apellidos: Pedro Oyarzun Fagundez
--- Números: 242531
+-- Nombres y apellidos: Pedro Oyarzun y Nicolás Romero
+-- Números: 242531 y 280487
 ----------------------------------------------------
 
 import Prelude
