@@ -41,32 +41,32 @@ eval i (Bin l o r) = case o of
 
 --1.2)
 itodasverdaderas ::  Var -> Bool
-itodasverdaderas = undefined
+itodasverdaderas _ = True
 
 --1.3)
 itodasfalsas :: Var -> Bool
-itodasfalsas = undefined
+itodasfalsas _ = False
 
 --1.4)
 irfalsa :: Var -> Bool
-irfalsa = undefined 
+irfalsa x = not (x == "r")
 
 --1.5)
 -- Completar con verdadera/falsa:
--- fa es ... bajo itodasfalsas
--- fb es ... bajo itodasfalsas
--- fc es ... bajo itodasfalsas
--- fd es ... bajo itodasfalsas
+-- fa es Falsa bajo itodasfalsas
+-- fb es Falsa bajo itodasfalsas
+-- fc es Verdadera bajo itodasfalsas
+-- fd es Falsa bajo itodasfalsas
 -- 
--- fa es ... bajo itodasverdaderas
--- fb es ... bajo itodasverdaderas
--- fc es ... bajo itodasverdaderas
--- fd es ... bajo itodasverdaderas
+-- fa es Verdadera bajo itodasverdaderas
+-- fb es Falsa bajo itodasverdaderas
+-- fc es Verdadera bajo itodasverdaderas
+-- fd es Falsa bajo itodasverdaderas
 --
--- fa es ... bajo irfalsa
--- fb es ... bajo irfalsa
--- fc es ... bajo irfalsa
--- fd es ... bajo irfalsa
+-- fa es Verdadera bajo irfalsa
+-- fb es Falsa bajo irfalsa
+-- fc es Verdadera bajo irfalsa
+-- fd es Falsa bajo irfalsa
 
 --1.6)
 creari :: [(Var, Bool)] -> (Var -> Bool)
