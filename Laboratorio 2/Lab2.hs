@@ -70,12 +70,18 @@ irfalsa x = not (x == "r")
 
 --1.6)
 creari :: [(Var, Bool)] -> (Var -> Bool)
-creari = undefined
+creari lista v = case lista of
+    [] -> False
+    (x,b):xs -> case x == v of
+        True  -> b
+        False -> creari xs v
 
 --1.7)
 -- Responder aquí.
-
-
+{-
+Si, es la misma interpretacion, al hacer las asignaciones,
+en ambas interpretaciones el resultado es False, al pasarle r como parametro y True al pasarle p y q
+-}
 -- EJERCICIO 2 --
 type Fila = [(Var, Bool)]
 type TV = [(Fila, Bool)]
@@ -84,7 +90,14 @@ data Clase = Tau | Contra | Cont | Sat | Fal
 
 --2.1)
 filas :: [Var] -> [Fila]
-filas = undefined
+filas variables = case variables of
+  [] -> [[]]
+  x:xs -> agregar (x, False) (filas xs) ++ agregar (x, True) (filas xs)
+
+agregar :: (Var, Bool) -> [Fila] -> [Fila]
+agregar par filas = case filas of
+  [] -> []
+  x:xs -> (par : x) : agregar par xs
 
 --2.2)
 tv :: L -> TV
