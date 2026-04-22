@@ -1,10 +1,11 @@
 module Lab2 where
 ------------------- Estudiante/s -------------------
--- Nombres y apellidos: Pedro Oyarzun y Nicolás Romero
--- Números: 242531 y 
+-- Nombres y apellidos: Pedro Oyarzun y Matias Romero
+-- Números: 242531 y 280487
 ----------------------------------------------------
 
 import Prelude
+import Data.List
 
 -- Formalización del lenguaje
 type Var = String
@@ -90,35 +91,84 @@ data Clase = Tau | Contra | Cont | Sat | Fal
 
 --2.1)
 filas :: [Var] -> [Fila]
-filas variables = case variables of
-  [] -> [[]]
-  x:xs -> agregar (x, False) (filas xs) ++ agregar (x, True) (filas xs)
-
-agregar :: (Var, Bool) -> [Fila] -> [Fila]
-agregar par filas = case filas of
-  [] -> []
-  x:xs -> (par : x) : agregar par xs
+filas [] = [[]]
+filas (x:xs) = [[(x, b)] ++ f | b <- [True, False], f <- filas xs]
 
 --2.2)
 tv :: L -> TV
-tv = undefined
+tv l = [(fila, eval (creari fila) l) | fila <- filas (listarProp l)]
+
+-- Importamos listarProp de Lab1
+listarProp :: L -> [Var]
+listarProp (V x) = [x]
+listarProp (Neg l) = listarProp l
+listarProp (Bin l _ r) = nub (listarProp l ++ listarProp r)
 
 --2.3)
+-- [(Fila, Bool)]
 es :: L -> Clase -> Bool
-es = undefined
+es l c = case c of 
+  Tau -> esTautologia (tv l)
+  Contra -> esContradiccion (tv l)
+  Cont -> esContingencia (tv l)
+  Sat -> esSatisfacible (tv l)
+  Fal -> esFalsificable (tv l)
+
+esTautologia :: TV -> Bool
+esTautologia [] = True
+esTautologia ((_, b):xs) = b && esTautologia xs
+
+esContradiccion :: TV -> Bool
+esContradiccion [] = True
+esContradiccion ((_, b):xs) = not(b) && esContradiccion xs
+
+esContingencia :: TV -> Bool
+esContingencia t = esSatisfacible t && esFalsificable t
+
+esSatisfacible :: TV -> Bool
+esSatisfacible [] = False
+esSatisfacible ((_, b):xs) = b || esSatisfacible xs
+
+esFalsificable :: TV -> Bool
+esFalsificable [] = False
+esFalsificable ((_, b):xs) = not b || esFalsificable xs
 
 --2.4)
 -- Completar con tautología/contingencia/contradicción:
--- fa es ...
--- fb es ...
--- fc es ...
--- fd es ...
+-- fa es Contingencia
+-- fb es Contingencia
+-- fc es Tautologia
+-- fd es Falseable
 
 --2.5) 
 fnc :: L -> L
-fnc = undefined
+fnc f = case [clausula fila | (fila, False) <- tv f] of
+  []     -> Bin (V "p") Or (Neg (V "p"))
+  (c:cs) -> combinarAnd c cs
 
 
+clausula :: Fila -> L
+clausula fila = case fila of
+  [] -> V "True"
+  (v,b):xs ->
+    case b of
+      True  -> combinarOr (Neg (V v)) xs
+      False -> combinarOr (V v) xs
+
+
+combinarOr :: L -> [(Var,Bool)] -> L
+combinarOr acc lista = case lista of
+  [] -> acc
+  (v,b):xs ->
+    case b of
+      True  -> combinarOr (Bin acc Or (Neg (V v))) xs
+      False -> combinarOr (Bin acc Or (V v)) xs
+
+
+combinarAnd :: L -> [L] -> L
+combinarAnd acc lista = case lista of
+  [] -> acc
+  (x:xs) -> combinarAnd (Bin acc And x) xs
 ----------------------------------------------------------------------------------
 -- Pretty Printing (rudimentario)
 ----------------------------------------------------------------------------------
