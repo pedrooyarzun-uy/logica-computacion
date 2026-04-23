@@ -148,7 +148,7 @@ fnc f = case [clausula fila | (fila, False) <- tv f] of
 
 
 clausula :: Fila -> L
-clausula fila = case fila of
+clausula f = case f of
   [] -> V "True"
   (v,b):xs ->
     case b of
@@ -157,18 +157,18 @@ clausula fila = case fila of
 
 
 combinarOr :: L -> [(Var,Bool)] -> L
-combinarOr acc lista = case lista of
-  [] -> acc
+combinarOr l lista = case lista of
+  [] -> l
   (v,b):xs ->
     case b of
-      True  -> combinarOr (Bin acc Or (Neg (V v))) xs
-      False -> combinarOr (Bin acc Or (V v)) xs
+      True  -> combinarOr (Bin l Or (Neg (V v))) xs
+      False -> combinarOr (Bin l Or (V v)) xs
 
 
 combinarAnd :: L -> [L] -> L
-combinarAnd acc lista = case lista of
-  [] -> acc
-  (x:xs) -> combinarAnd (Bin acc And x) xs
+combinarAnd l lista = case lista of
+  [] -> l
+  (x:xs) -> combinarAnd (Bin l And x) xs
 ----------------------------------------------------------------------------------
 -- Pretty Printing (rudimentario)
 ----------------------------------------------------------------------------------
