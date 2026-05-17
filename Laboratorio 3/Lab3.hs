@@ -1,7 +1,7 @@
 module Lab3 where
 ------------------- Estudiante/s -------------------
--- Nombres y apellidos: 
--- Números: 
+-- Nombres y apellidos: Pedro Oyarzun y Matias Romero
+-- Números: 242531 y 280487
 ----------------------------------------------------
 
 import Prelude
@@ -38,24 +38,17 @@ bot = Bin (V "p") And (Neg $ V "p")
 -- Pos: retorna True si y solo si la lista es consistente, o sea no contiene un par de literales complementarios
 esConsistente :: [L] -> Bool
 esConsistente [] = True
-esConsistente (x:xs) =
-  not (elem (complemento x) xs) && esConsistente xs
-
-complemento :: L -> L
-complemento (V x) = Neg (V x)
-complemento (Neg (V x)) = V x
-complemento (Neg (Neg x)) = complemento x
+esConsistente (V x : xs) = not (elem (Neg (V x)) xs) && esConsistente xs
+esConsistente (Neg (V x) : xs) = not (elem (V x) xs) && esConsistente xs
 
 -- 2)
 -- Pre: recibe una interpretación dada como lista de asignaciones (no vacía y consistente) 
 -- Pos: retorna la interpretación expresada como una conjunción de literales
 int2f :: I -> L
-int2f [(v,b)] = literal v b
-int2f ((v,b):xs) = Bin (literal v b) And (int2f xs)
-
-literal :: Var -> Bool -> L
-literal v True = V v
-literal v False = Neg (V v)
+int2f [(v, True)] = V v
+int2f [(v, False)] = Neg (V v)
+int2f ((v, True):xs) = Bin (V v) And (int2f xs)
+int2f ((v, False):xs) = Bin (Neg (V v)) And (int2f xs)
 
 -- 3)
 
@@ -68,23 +61,29 @@ esAlfa :: L -> Bool
 esAlfa (Bin _ And _) = True
 esAlfa (Neg (Bin _ Or _)) = True
 esAlfa (Neg (Bin _ Imp _)) = True
+esAlfa (Neg (Neg _)) = True
+esAlfa (Bin _ Iff _) = True
 esAlfa _ = False
 
 esBeta :: L -> Bool
 esBeta (Bin _ Or _) = True
 esBeta (Bin _ Imp _) = True
 esBeta (Neg (Bin _ And _)) = True
+esBeta (Neg (Bin _ Iff _)) = True
 esBeta _ = False
 
 descomponerAlfa :: L -> [L]
 descomponerAlfa (Bin p And q) = [p,q]
 descomponerAlfa (Neg (Bin p Or q)) = [Neg p, Neg q]
 descomponerAlfa (Neg (Bin p Imp q)) = [p, Neg q]
+descomponerAlfa (Neg (Neg p)) = [p]
+descomponerAlfa (Bin p Iff q) = [Bin p Imp q, Bin q Imp p]
 
 descomponerBeta :: L -> ([L],[L])
 descomponerBeta (Bin p Or q) = ([p],[q])
 descomponerBeta (Bin p Imp q) = ([Neg p],[q])
 descomponerBeta (Neg (Bin p And q)) = ([Neg p],[Neg q])
+descomponerBeta (Neg (Bin p Iff q)) = ([p, Neg q], [Neg p, q])
 
 -- Pre: recibe una fórmula f de LP
 -- Pos: retorna el tableau de f
@@ -125,8 +124,7 @@ sat f = satAux (tableau f)
 satAux :: Tableau -> Bool
 satAux (Hoja l) = esConsistente l
 satAux (Conj l t) = satAux t
-satAux (Dis l t1 t2) =
-  satAux t1 || satAux t2
+satAux (Dis l t1 t2) = satAux t1 || satAux t2
  
 -- 5)
 -- Pre: recibe una fórmula f de LP
@@ -134,37 +132,78 @@ satAux (Dis l t1 t2) =
 -- Recomendación: para imprimirlos los modelos en lineas distintas:
 --                ghci> mapM_ print $ modelos f
 modelos :: L -> [I]
-modelos f = undefined 
+modelos f = nub (map sort (concatMap (completarUno (vars f)) (hojasAbiertas (tableau f))))
+
+hojasAbiertas :: Tableau -> [I]
+hojasAbiertas (Hoja l) = case esConsistente l of
+  True -> [literalesAInterpretacion l]
+  False -> []
+hojasAbiertas (Conj _ t) = hojasAbiertas t
+hojasAbiertas (Dis _ t1 t2) = hojasAbiertas t1 ++ hojasAbiertas t2
+
+literalesAInterpretacion :: [L] -> I
+literalesAInterpretacion [] = []
+literalesAInterpretacion (V x : xs) = case elem x (map fst (literalesAInterpretacion xs)) of
+  True -> literalesAInterpretacion xs
+  False -> (x, True) : literalesAInterpretacion xs
+literalesAInterpretacion (Neg (V x) : xs) = case elem x (map fst (literalesAInterpretacion xs)) of
+  True -> literalesAInterpretacion xs
+  False -> (x, False) : literalesAInterpretacion xs
+literalesAInterpretacion (_ : xs) = literalesAInterpretacion xs
+
+completarUno :: [Var] -> I -> [I]
+completarUno [] i = [i]
+completarUno (v:vs) i = case elem v (map fst i) of
+  True -> completarUno vs i
+  False -> completarUno vs ((v, True):i) ++ completarUno vs ((v, False):i)
 
 -- 6)
 -- Pre: recibe una fórmula f de LP
 -- Pos: retorna la clase semántica a la que pertenece f
 clasificar :: L -> Clase
-clasificar f = undefined
+clasificar f = case sat f of
+  False -> Contra
+  True -> case sat (Neg f) of 
+    False -> Tau
+    True -> Conti
 
 -- 7)
 -- Pre: recibe una consecuencia
 -- Pos: retorna la consecuencia expresada como una fórmula de LP
 cons2f :: Consecuencia -> L
-cons2f cl = undefined
+cons2f ([] :|= f) = f
+cons2f ((x:xs) :|= f) = Bin (juntar (x:xs)) Imp f
+
+juntar :: [L] -> L
+juntar [f] = f
+juntar (x:xs) = Bin x And (juntar xs)
 
 -- 8)     
 -- Pre: recibe una consecuencia
 -- Pos: retorna True si y solo si la consecuencia es válida
 valida :: Consecuencia -> Bool
-valida cl = undefined
+valida cl = clasificar (cons2f cl) == Tau
 
 -- 9)
 -- Pre: recibe una fórmula f de LP
 -- Pos: retorna f en FND
 fnd :: L -> L
-fnd f = undefined
+fnd f = juntarOr (map int2f (modelos f))
+
+juntarOr :: [L] -> L
+juntarOr [f] = f
+juntarOr (x:xs) = Bin x Or (juntarOr xs)
 
 -- 10)
 -- Pre: recibe una fórmula f de LP
 -- Pos: retorna f en FNC
 fnc :: L -> L
-fnc f = undefined
+fnc f = juntarAnd (map (invertir . int2f) (modelos (Neg f)))
+
+juntarAnd :: [L] -> L
+juntarAnd [] = top
+juntarAnd [x] = x
+juntarAnd (x:xs) = Bin x And (juntarAnd xs)
 
 
 ----------------------------------------------------------------------------------
