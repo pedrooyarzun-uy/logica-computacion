@@ -19,7 +19,8 @@ import PropLogic
 
 -- a) "Existen al menos k índices que cumplen la fórmula f"
 existAtLeast :: Nat -> [Nat] -> (Nat -> L) -> L
-existAtLeast k is f = undefined
+existAtLeast 1 is f = bigOr is f 
+existAtLeast k is f = bigOr is (\i -> f i /\ existAtLeast (k-1) (is\\[i]) f) 
 
 -- b) "Existen a lo sumo k índices que cumplen la fórmula f"
 existAtMost :: Nat -> [Nat] -> (Nat -> L) -> L
