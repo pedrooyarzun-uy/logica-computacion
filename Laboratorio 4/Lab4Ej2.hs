@@ -55,11 +55,17 @@ existAtMost' name k is p
 
 -- b) "Existen a al menos k índices que cumplen la fórmula f"
 existAtLeast' :: String -> Nat -> [Nat] -> (Nat -> L) -> L
-existAtLeast' name k is p = undefined
+existAtLeast' name k is p
+  | k <= 0 = top
+  | k > n  = bot
+  | otherwise = existAtMost' name (n - k) is (\i -> neg (p i))
+  where
+    n = length is
 
 -- c) "Existen exactamente k índices que cumplen la fórmula f"
 existExact' :: String -> String -> Nat -> [Nat] -> (Nat -> L) -> L
-existExact' name1 name2 k is f = undefined
+existExact' name1 name2 k is f =
+  existAtLeast' name1 k is f /\ existAtMost' name2 k is f
 
 ----------------------------------------------------------------------------------
 -- 2.3. Estimación de tamaño y eficiencia
