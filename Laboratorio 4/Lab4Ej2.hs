@@ -25,21 +25,21 @@ existAtLeast k is f = bigOr is (\i -> f i /\ existAtLeast (k-1) (is\\[i]) f)
 
 -- b) "Existen a lo sumo k índices que cumplen la fórmula f"
 existAtMost :: Nat -> [Nat] -> (Nat -> L) -> L
-existAtMost k is f = undefined
+existAtMost k is f = neg (existAtLeast (k+1) is f)
 
 -- c) "Existen exactamente k índices que cumplen la fórmula f"
 existExact :: Nat -> [Nat] -> (Nat -> L) -> L
-existExact k is f = undefined
+existExact k is f = existAtLeast k is f /\ existAtMost k is f
 
 ----------------------------------------------------------------------------------
 -- 2.2. Cardinalidad a la Sinz
 ----------------------------------------------------------------------------------
 
 -- a) "Existen a lo sumo k índices que cumplen la fórmula f"
-existAtMost' :: String -> Nat -> [Nat] -> (Nat -> L) -> L
+existAtMost' :: String -> Nat -> [Nat] -> (Nat -> L) -> L -- O(n^2)
 existAtMost' name k is p 
   | k >= (length is) = top
-  | k == 0 = bigAnd is (\i -> neg (p i))
+  | k == 0 = bigAnd is (\i -> neg (p i)) -- O(n)
   | n == 0 = top
   | otherwise = foldr (/\) top rules 
   where 
