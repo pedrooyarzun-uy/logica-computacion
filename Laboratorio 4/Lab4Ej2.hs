@@ -71,13 +71,23 @@ existExact' name1 name2 k is f =
 -- 2.3. Estimación de tamaño y eficiencia
 ----------------------------------------------------------------------------------
 
---a) RESPUESTA AQUÍ
+-- a) El tamaño de existExact naive crece de forma exponencial a medida que aumentan
+--    n y k, ya que necesita generar todas las combinaciones posibles de k elementos
+--    entre n, lo que da C(n,k) combinaciones. Cuanto más grande es k respecto a n,
+--    más combinaciones hay y más grande es la fórmula.
 
---b) RESPUESTA AQUÍ
+-- b) El tamaño de existExact Sinz crece de forma más controlada, ya que en lugar
+--    de enumerar combinaciones usa variables auxiliares y reglas simples. El tamaño
+--    depende de n y k de forma proporcional a n*k, lo que es mucho menor que C(n,k)
+--    para valores grandes.
 
---c) RESPUESTA AQUÍ
+-- c) Fijando n y aumentando k, la versión naive crece muy rápido porque C(n,k)
+--    aumenta mucho (llega al máximo en k=n/2). La versión Sinz en cambio crece
+--    de forma mucho más suave, casi lineal en k.
 
---d) RESPUESTA AQUÍ
+-- d) Preferiríamos usar Sinz cuando n y k son grandes, porque genera fórmulas
+--    mucho más chicas y el solver las procesa más rápido. La versión naive puede
+--    ser suficiente cuando n y k son pequeños, ya que es más simple de entender.
 
 ----------------------------------------------------------------------------------
 -- Testing de equivalencia de la codificación
