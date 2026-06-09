@@ -19,6 +19,7 @@ import PropLogic
 
 -- a) "Existen al menos k índices que cumplen la fórmula f"
 existAtLeast :: Nat -> [Nat] -> (Nat -> L) -> L
+existAtLeast 0 is f = top
 existAtLeast 1 is f = bigOr is f 
 existAtLeast k is f = bigOr is (\i -> f i /\ existAtLeast (k-1) (is\\[i]) f) 
 
@@ -34,11 +35,25 @@ existExact k is f = undefined
 -- 2.2. Cardinalidad a la Sinz
 ----------------------------------------------------------------------------------
 
--- a) "Existen al menos k índices que cumplen la fórmula f"
+-- a) "Existen a lo sumo k índices que cumplen la fórmula f"
 existAtMost' :: String -> Nat -> [Nat] -> (Nat -> L) -> L
-existAtMost' name k is p = undefined
+existAtMost' name k is p 
+  | k >= (length is) = top
+  | k == 0 = bigAnd is (\i -> neg (p i))
+  | n == 0 = top
+  | otherwise = foldr (/\) top rules 
+  where 
+    n = length is
+    s i j  = v2 name i j
+    rules =  r2 ++ r3 ++ r4 ++ r5
 
--- b) "Existen a lo sumo k índices que cumplen la fórmula f"
+    r2 = [(p i) ==> (s i 1) | i <- [1..n]] -- O(n)
+    r3 = [(s (i-1) j ==> s i j) | i <- [2..n], j <- [1..k]] --O(n*k)
+    r4 = [(p i) /\ s (i-1) (j-1) ==> s i j | i <- [2..n], j <- [2..k]] -- O(n*k)
+    r5 = [s (i-1) k ==> neg (p i) | i <- [2..n]] -- O(n)
+
+
+-- b) "Existen a al menos k índices que cumplen la fórmula f"
 existAtLeast' :: String -> Nat -> [Nat] -> (Nat -> L) -> L
 existAtLeast' name k is p = undefined
 
