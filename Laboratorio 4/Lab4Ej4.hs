@@ -130,7 +130,7 @@ solveClosedKnightTour n = solveHamilCycle (knightGraph n)
 -- |   5 |      Si           |        No         |
 -- |   6 |      Si           |        Si         |
 -- |   7 |      Si           |        -          |
--- |   8 |      Si           |        -          |
+-- |   8 |      Si           |        Si         |
 
 -- d) 
 solveClosedKnightTourFrom :: (Nat,Nat) -> Nat -> IO (Maybe Model)
@@ -139,4 +139,4 @@ solveClosedKnightTourFrom (i,j) n =
          varDecl "Bool" "p" : genVars2 "Bool" "h" [1..n*n] [1..n*n],
          map lp2SMT (hamilCycle (knightGraph n) ++ [v2 "h" 1 (casilla n i j)]))
 
--- e)
+-- e) Hay recorrido, es correcto
