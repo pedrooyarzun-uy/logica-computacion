@@ -95,24 +95,48 @@ g8' = (8, [(3,2),(3,6),(2,1),(2,5),(1,4),(4,5),(4,7),(5,7),(5,8),(8,7),(8,6),(7,
 
 -- a)
 solveKnightTour :: Nat -> IO (Maybe Model)
-solveKnightTour = undefined
+solveKnightTour n = solveHamilPath (knightGraph n)
+
+knightGraph :: Nat -> Graph
+knightGraph n =
+  (n*n,
+   [ (casilla n i j, casilla n i' j')
+   | i  <- [1..n]
+   , j  <- [1..n]
+   , i' <- [1..n]
+   , j' <- [1..n]
+   , knightMove (i,j) (i',j')
+   ])
+
+casilla :: Nat -> Nat -> Nat -> Nat
+casilla n i j = (i - 1) * n + j
+
+knightMove :: (Nat,Nat) -> (Nat,Nat) -> Bool
+knightMove (i,j) (i',j') =
+  (abs (i - i') == 1 && abs (j - j') == 2) ||
+  (abs (i - i') == 2 && abs (j - j') == 1)
 
 -- b)
 solveClosedKnightTour :: Nat -> IO (Maybe Model)
-solveClosedKnightTour = undefined
+solveClosedKnightTour n = solveHamilCycle (knightGraph n)
 
 -- c) COMPLETAR CON RESULTADOS
 -- | (n) | Recorrido abierto | Recorrido cerrado |
 -- | --: | :---------------: | :---------------: |
--- |   1 |       
--- |   2 |       
--- |   3 |       
--- |   4 |      
--- |   5 |      
--- |   6 |      
--- |   7 |       
--- |   8 |       
+-- |   1 |      Si           |        No         |
+-- |   2 |      No           |        No         |
+-- |   3 |      No           |        No         |
+-- |   4 |      No           |        No         |
+-- |   5 |      Si           |        No         |
+-- |   6 |      Si           |        Si         |
+-- |   7 |      Si           |        -          |
+-- |   8 |      Si           |        -          |
 
 -- d) 
 solveClosedKnightTourFrom :: (Nat,Nat) -> Nat -> IO (Maybe Model)
-solveClosedKnightTourFrom = undefined
+solveClosedKnightTourFrom (i,j) n =
+  solve ("QF_UF",
+         varDecl "Bool" "p" : genVars2 "Bool" "h" [1..n*n] [1..n*n],
+         map lp2SMT (hamilCycle (knightGraph n) ++ [v2 "h" 1 (casilla n i j)]))
+
+-- e)
